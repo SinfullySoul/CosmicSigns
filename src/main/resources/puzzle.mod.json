@@ -1,0 +1,25 @@
+{
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_desc}",
+  "authors": [
+    "YOU :D"
+  ],
+  "meta": {
+    "icon": "cosmic-signs:icons/icon.png"
+  },
+  "entrypoints": {
+    "init": [
+      "com.github.sinfullysoul.CosmicSigns"
+    ]
+  },
+  "mixins": [
+    "cosmic-signs.mixins.json"
+  ],
+  "dependencies": {
+    "cosmic-reach": ">=0.3.1",
+    "puzzle-loader": ">=1.5.9"
+  },
+  "accessManipulator": "cosmic-signs.manipulator"
+}

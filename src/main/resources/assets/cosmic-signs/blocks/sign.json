@@ -1,0 +1,16 @@
+{
+  "stringId": "cosmic-signs:sign",
+  "blockEntityId": "cosmic-signs:sign_entity",
+  "blockStates":
+  {
+    "default":
+    {
+      "modelName": "cosmic-signs:model_sign",
+      "walkThrough": true,
+      "isOpaque":false,
+      "isTransparent":false,
+      "catalogHidden":true,
+      "stateGenerators": ["base:rotated"]
+    }
+  }
+}
