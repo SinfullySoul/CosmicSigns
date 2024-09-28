@@ -78,7 +78,8 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
         super.read(deserial);
         this.texts = deserial.readStringArray("lines");
         this.textSize = deserial.readFloat("textsize", 14);
-        this.fontcolor = new Color().set(deserial.readInt("textcolor", Color.BLACK.toIntBits()));
+        this.fontcolor = new Color();
+        Color.rgba8888ToColor(this.fontcolor, deserial.readInt("textcolor", Color.rgba8888(Color.BLACK)));
     }
 
     @Override
@@ -86,7 +87,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
         super.write(serial);
         serial.writeStringArray("lines", texts);
         serial.writeFloat("textsize", this.textSize);
-        serial.writeInt("textcolor", this.fontcolor.toIntBits());
+        serial.writeInt("textcolor", Color.rgba8888(this.fontcolor));
     }
 
     @Override

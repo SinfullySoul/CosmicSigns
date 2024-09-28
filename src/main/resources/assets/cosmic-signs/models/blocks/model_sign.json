@@ -7,22 +7,22 @@
 	"cuboids": [{
 		"localBounds": [7,0,7,9,6,9],
 		"faces": {
-			"localNegX": {"uv":[0,0,2,6],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localPosX": {"uv":[0,0,2,6],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localNegY": {"uv":[0,0,2,2],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localPosY": {"uv":[0,0,2,2],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localNegZ": {"uv":[0,0,2,6],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localPosZ": {"uv":[0,0,2,6],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"}
+			"localNegX": {"uv":[0,0,2,6],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
+			"localPosX": {"uv":[0,0,2,6],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
+			"localNegY": {"uv":[0,0,2,2],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
+			"localPosY": {"uv":[0,0,2,2],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
+			"localNegZ": {"uv":[0,0,2,6],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
+			"localPosZ": {"uv":[0,0,2,6],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"}
 		}
 	}, {
 		"localBounds": [7,6,2,9,13,14],
 		"faces": {
-			"localNegX": {"uv":[0,0,2,7],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localPosX": {"uv":[0,0,2,7],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
+			"localNegX": {"uv":[0,0,2,7],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
+			"localPosX": {"uv":[0,0,2,7],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
 			"localNegY": {"uv":[0,0,12,2],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localPosY": {"uv":[0,0,12,2],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localNegZ": {"uv":[0,0,12,7],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"},
-			"localPosZ": {"uv":[0,0,12,7],"ambientocclusion":false,"cullFace":true,"texture":"wood_planks"}
+			"localPosY": {"uv":[0,0,12,2],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
+			"localNegZ": {"uv":[0,0,12,7],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"},
+			"localPosZ": {"uv":[0,0,12,7],"ambientocclusion":false,"cullFace":false,"texture":"wood_planks"}
 		}
 	}]
 }
