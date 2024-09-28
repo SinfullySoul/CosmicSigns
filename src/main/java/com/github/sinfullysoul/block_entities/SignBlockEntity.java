@@ -261,8 +261,6 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
         if (!shader.isCompiled()) {
             String log = SignBlockEntity.shader.getLog();
             throw new RuntimeException( "Sign Shader is not compiled!\n" + log);
-        } else {
-            System.out.println("SIGN SHADER COMPILED!!!!");
         }
     }
 }
