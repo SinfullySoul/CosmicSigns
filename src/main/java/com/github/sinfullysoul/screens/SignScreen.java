@@ -99,7 +99,10 @@ public class SignScreen extends BasePuzzleScreen {
             final SignBlockEntity entity = SignScreen.this.entity;
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(entity.textSize > 6) entity.textSize -= 1;
+                if(entity.textSize > 6) {
+                    entity.textSize -= 1;
+                    entity.runTexture = true;
+                }
             }
         });
         ImageButton addButton = new ImageButton(buttonRight);
@@ -107,7 +110,10 @@ public class SignScreen extends BasePuzzleScreen {
             final SignBlockEntity entity = SignScreen.this.entity;
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(entity.textSize < 14) entity.textSize += 1;
+                if(entity.textSize < 14) {
+                    entity.textSize += 1;
+                    entity.runTexture = true;
+                }
             }
         });
 
@@ -149,6 +155,7 @@ public class SignScreen extends BasePuzzleScreen {
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
                     entity.fontcolor = color;
+                    entity.runTexture = true;
                 }
             });
             if(i > 0 && i % 4 == 0) table.row();
