@@ -42,7 +42,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
     public Color fontcolor = Color.BLACK;
 
     private Texture texture;
-    private ShaderProgram shader;
+    private static ShaderProgram shader = null;
     private Matrix4 modelMatrix;
     private Mesh mesh;
     private FrameBuffer fbo;
@@ -88,6 +88,17 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
         serial.writeStringArray("lines", texts);
         serial.writeFloat("textsize", this.textSize);
         serial.writeInt("textcolor", Color.rgba8888(this.fontcolor));
+    }
+    @Override
+    public void onUnload() {
+        this.loaded = false;
+        if (mesh != null) {
+            Gdx.app.postRunnable(() -> {
+                mesh.dispose();
+                texture.dispose();
+                fbo.dispose();
+            });
+        }
     }
 
     @Override
@@ -148,27 +159,6 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
             mesh.setVertices(vertices);
             mesh.setIndices(indices);
 
-            String vertexShader = "attribute vec3 a_position; \n" +
-                    "attribute vec2 a_texCoords; \n" +
-                    "uniform mat4 u_projTrans; \n" +
-                    "uniform mat4 u_modelMatrix; \n" +
-                    "varying vec2 v_texCoords;  \n" +
-                    "void main() { \n" +
-                    "    v_texCoords = a_texCoords; \n" +
-                    "    gl_Position = u_projTrans * u_modelMatrix * vec4(a_position, 1.0); \n" +
-                    "}";
-            String fragmentShader =
-                    "uniform int u_flipX;" +
-                    "varying vec2 v_texCoords; \n" +
-                    "uniform sampler2D u_texture; \n" +
-                    "void main() { \n" +
-                    "   vec2 flippedTexCoord = v_texCoords;"+
-                    "   if (u_flipX == 1) {\n" +
-                    "        flippedTexCoord.x = 1.0 - v_texCoords.x;\n" +
-                    "   }" +
-                    "gl_FragColor = texture2D(u_texture, flippedTexCoord); } \n";
-
-            shader = new ShaderProgram(vertexShader, fragmentShader);
             fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 1000, 1000, false);
         }
         if(runTexture) texture = buildTexture();
@@ -189,7 +179,6 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
         super.onRemove();
         mesh.dispose();
         texture.dispose();
-        shader.dispose();
         fbo.dispose();
     }
 
@@ -247,5 +236,33 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
             font.getData().setScale(14);
             signbasefont = new Label.LabelStyle(font, Color.BLACK);
         });
+    }
+    public static void initSignShader() {
+        String vertexShader = "attribute vec3 a_position; \n" +
+                "attribute vec2 a_texCoords; \n" +
+                "uniform mat4 u_projTrans; \n" +
+                "uniform mat4 u_modelMatrix; \n" +
+                "varying vec2 v_texCoords;  \n" +
+                "void main() { \n" +
+                "    v_texCoords = a_texCoords; \n" +
+                "    gl_Position = u_projTrans * u_modelMatrix * vec4(a_position, 1.0); \n" +
+                "}";
+        String fragmentShader =
+                "uniform int u_flipX;" +
+                        "varying vec2 v_texCoords; \n" +
+                        "uniform sampler2D u_texture; \n" +
+                        "void main() { \n" +
+                        "   vec2 flippedTexCoord = v_texCoords;"+
+                        "   if (u_flipX == 1) {\n" +
+                        "        flippedTexCoord.x = 1.0 - v_texCoords.x;\n" +
+                        "   }" +
+                        "gl_FragColor = texture2D(u_texture, flippedTexCoord); } \n";
+        shader = new ShaderProgram(vertexShader, fragmentShader);
+        if (!shader.isCompiled()) {
+            String log = SignBlockEntity.shader.getLog();
+            throw new RuntimeException( "Sign Shader is not compiled!\n" + log);
+        } else {
+            System.out.println("SIGN SHADER COMPILED!!!!");
+        }
     }
 }

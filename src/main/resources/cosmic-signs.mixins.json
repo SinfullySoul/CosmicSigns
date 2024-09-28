@@ -8,7 +8,8 @@
     "ChunkMixin",
     "ControlsMixin",
     "InGameMixin",
-    "ZoneMixin"
+    "ZoneMixin",
+    "GameShaderMixin"
   ],
   "client": [],
   "server": [],
