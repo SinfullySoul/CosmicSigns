@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -15,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.github.puzzle.game.ui.font.CosmicReachFont;
+import com.github.puzzle.game.ui.font.FontTexture;
 import com.github.sinfullysoul.Constants;
 import com.github.sinfullysoul.api.IRenderable;
 import finalforeach.cosmicreach.GameSingletons;
@@ -26,6 +29,7 @@ import finalforeach.cosmicreach.entities.player.Player;
 import finalforeach.cosmicreach.gamestates.InGame;
 import finalforeach.cosmicreach.io.CRBinDeserializer;
 import finalforeach.cosmicreach.io.CRBinSerializer;
+import finalforeach.cosmicreach.ui.FontRenderer;
 import finalforeach.cosmicreach.util.Identifier;
 import finalforeach.cosmicreach.world.Zone;
 
@@ -95,7 +99,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
         if (mesh != null) {
             Gdx.app.postRunnable(() -> {
                 mesh.dispose();
-                texture.dispose();
+                //texture.dispose();
                 fbo.dispose();
             });
         }
@@ -112,6 +116,108 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
     public String getBlockEntityId() {
         return id.toString();
     }
+private Vector2 getCharUv(char c) {
+
+        Vector2 tmp = new Vector2();
+    TextureRegion tr = CosmicReachFont.FONT.getRegion();
+
+    int width = tr.getRegionWidth();
+    int height = tr.getRegionHeight();
+    tmp.x = (float)(c  % 16);
+    tmp.y = (float)(c / 16) ;
+
+    return tmp;
+}
+    private void generateTextMesh() {
+        int x = this.getGlobalX();
+        int y = this.getGlobalY();
+        int z = this.getGlobalZ();
+        int x2;
+        int y2;
+        int z2;
+        int x1;
+        int y1;
+        int z1; //
+        float[] verts = new float[20];
+
+        int i = 0;
+         float SIZE_X = 16f / CosmicReachFont.FONT.getRegion().getRegionWidth();
+         float SIZE_Y = 16f / CosmicReachFont.FONT.getRegion().getRegionHeight();
+         //SIZE_Y = 1.0f;
+         //SIZE_X = 1.0f;
+        Vector2 uv = getCharUv('A');
+        //uv.x = 0f;
+        //uv.y = 0f;
+        uv.x = uv.x * SIZE_X;
+        uv.y = uv.y * SIZE_Y;
+        //uv.y = 1 - uv.y;
+        Constants.LOGGER.info(uv);
+        Constants.LOGGER.info("{} SIZE{}", SIZE_X, SIZE_Y);
+        short[] indices;
+        modelMatrix = new Matrix4().idt();
+        if(dir == 0) {
+            indices = new short[]{0, 1, 2, 2, 3, 0};
+            modelMatrix.translate(new Vector3(0f,0f,0.568f));
+            x2 = 0;
+        }
+        else if(dir == 90) {
+            indices = new short[]{2, 1, 0, 0, 3, 2};
+            modelMatrix.translate(new Vector3(-1f,0f,0.43f));
+        }
+        else if (dir == 180) {
+            indices = new short[]{0, 1, 2, 2, 3, 0};
+            modelMatrix.translate(new Vector3(-1f,0f,-0.43f));
+            flip = 1;
+        }
+        else if(dir == 270) {
+            indices = new short[]{0, 1, 2, 2, 3, 0};
+            modelMatrix.translate(new Vector3());
+        }
+        else {
+            indices = new short[]{2, 1, 0, 0, 3, 2};
+            modelMatrix.translate(new Vector3(0f,0f,-0.568f));
+        }
+        verts[i++] = x; // x1
+        verts[i++] = y; // y1
+        verts[i++] = z;
+        verts[i++] = uv.x; // u1
+        verts[i++] = uv.y + SIZE_Y; // v1
+
+        verts[i++] = x + 1f; // x2
+        verts[i++] = y; // y2
+        verts[i++] = z;
+        verts[i++] = uv.x + SIZE_X; // u2
+        verts[i++] = uv.y + SIZE_Y; // v2
+
+        verts[i++] = x + 1f; // x3
+        verts[i++] = y + 1f; // y3
+        verts[i++] = z;
+        verts[i++] = uv.x + SIZE_X; // u3
+        verts[i++] = uv.y ; // v3
+
+        verts[i++] = x; // x4
+        verts[i++] = y + 1f; // y4
+        verts[i++] = z;
+        verts[i++] = uv.x ; // u4
+        verts[i++] = uv.y ; // v4
+
+
+
+        Constants.LOGGER.info("MESH AT " + x + " " + y + " " + z);
+        mesh = new Mesh(false, 4, 6,
+                new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+                new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoords")
+        );
+        mesh.setVertices(verts);
+
+
+        mesh.setIndices(indices);
+        TextureRegion tr = CosmicReachFont.FONT.getRegion();
+        texture = tr.getTexture();
+
+    }
+
+
 
     @Override
     public void onRender(Camera camera) {
@@ -160,16 +266,20 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
             mesh.setIndices(indices);
 
             fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 1000, 1000, false);
+            generateTextMesh();
         }
-        if(runTexture) texture = buildTexture();
+        Matrix4 tmp = new Matrix4().idt();
+       // if(runTexture) texture = buildTexture();
+        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
         shader.begin();
         shader.setUniformMatrix("u_projTrans", camera.combined);
-        shader.setUniformMatrix("u_modelMatrix", modelMatrix);
-        shader.setUniformi("u_flipX", flip);
+        shader.setUniformMatrix("u_modelMatrix", tmp);
+        shader.setUniformi("u_flipX", 0);
         texture.bind(0);
         shader.setUniformi("u_texture", 0);
         mesh.render(shader, GL20.GL_TRIANGLES);
         shader.end();
+        Gdx.gl.glEnable(GL20.GL_CULL_FACE);
     }
 
 
@@ -178,7 +288,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
     public void onRemove() {
         super.onRemove();
         mesh.dispose();
-        texture.dispose();
+        //texture.dispose();
         fbo.dispose();
     }
 
