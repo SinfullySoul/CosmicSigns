@@ -15,6 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.FloatArray;
+import com.badlogic.gdx.utils.ShortArray;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.github.puzzle.game.ui.font.CosmicReachFont;
 import com.github.puzzle.game.ui.font.FontTexture;
@@ -54,6 +56,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
     private FrameBuffer fbo;
     private int dir;
     private int flip = 0;
+
 
     public static void register() {
         BlockEntityCreator.registerBlockEntityCreator(id.toString(), (blockState, zone, x, y, z) -> {
@@ -102,7 +105,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
             Gdx.app.postRunnable(() -> {
                 mesh.dispose();
                 //texture.dispose();
-                fbo.dispose();
+                //fbo.dispose();
             });
         }
     }
@@ -112,6 +115,8 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
         super.onCreate(blockState);
         dir = blockState.rotXZ;
         dir -= 90;
+        Gdx.app.postRunnable(this::generateTextMesh);
+
     }
 
     @Override
@@ -131,24 +136,25 @@ private Vector2 getCharUv(char c) {
  float CHAR_SIZE_X;
     float CHAR_SIZE_Y;
     int line;
-private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
+private void addCharacterQuad(FloatArray verts, ShortArray indices, char c, int pos) {
 
 
     float u = CHAR_SIZE_X * (float)(c % 16); // i think this just has to be hardcoded
     float v = CHAR_SIZE_Y * (float)(c / 16);
 
-    float OFFSET_X = pos * CHAR_SIZE_X; //this has to be the size of the char * scale i think
+    float OFFSET_X = pos * CHAR_SIZE_X * 30 ; //this has to be the size of the char * scale i think
 
 
     float x = -0.5f + OFFSET_X;
     float y = -0.5f + 0f; //TODO add line offset
     float z = 0.075f;
+    Constants.LOGGER.info("QUAD X POS {}",x);
 
     verts.add( x); // x1
     verts.add( y); // y1
     verts.add( z);
     verts.add( u); // u1
-    verts.add( u + CHAR_SIZE_Y); // v1 //done like this because the image is flipped
+    verts.add( v + CHAR_SIZE_Y); // v1 //done like this because the image is flipped
 
     verts.add( x + 1f); // x2
     verts.add( y); // y2
@@ -168,7 +174,43 @@ private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
     verts.add( u ); // u4
     verts.add( v ); // v4
 
+    short offset = (short) (pos * 4);
+    indices.add(offset);
+    indices.add((short) (1 + offset)); //indices for each quad is the start idx in array + 0 1 2 2 3 0 for the indices
+    indices.add((short) (2 + offset));
+    indices.add((short) (2 + offset));
+    indices.add((short) (3 + offset));
+    indices.add(offset);
 
+}
+private void createTextLineMesh() {
+
+    String line;
+    line = texts[0];
+    int length = line.length();
+    if (length == 0) {
+        mesh = null;
+        return;
+    }
+    FloatArray verts = new FloatArray( length * 4 * 5); //character length * vertexes * vertex attributes
+    ShortArray indicies = new ShortArray(length * 6);
+
+
+    for(int i = 0; i < length; i++ ) {
+        addCharacterQuad(verts, indicies, line.charAt(i),i);
+
+    }
+
+    mesh = new Mesh(false, verts.size, indicies.size,
+            new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+            new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoords")
+    );
+
+    mesh.setVertices(verts.items);
+
+
+    mesh.setIndices(indicies.items);
+    //Constants.LOGGER.info("NEW {}", verts.items);
 
 }
     private void generateTextMesh() {
@@ -185,7 +227,7 @@ private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
          CHAR_SIZE_Y = SIZE_Y;
          //SIZE_Y = 1.0f;
          //SIZE_X = 1.0f;
-        Vector2 uv = getCharUv('A');
+        Vector2 uv = getCharUv('h');
         //uv.x = 0f;
         //uv.y = 0f;
         uv.x = uv.x * SIZE_X;
@@ -248,7 +290,7 @@ private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
         verts[i++] = uv.y ; // v4
 
 
-
+        Constants.LOGGER.info("OLD {}", verts);
         Constants.LOGGER.info("MESH AT " + x + " " + y + " " + z);
         mesh = new Mesh(false, 4, 6,
                 new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
@@ -258,6 +300,7 @@ private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
 
 
         mesh.setIndices(indices);
+        createTextLineMesh();
         TextureRegion tr = CosmicReachFont.FONT.getRegion();
         texture = tr.getTexture();
 
@@ -268,51 +311,13 @@ private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
     @Override
     public void onRender(Camera camera) {
         if(camera == null) return;
-        if(mesh == null) {
-            mesh = new Mesh(false, 4, 6,
-                    new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
-                    new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoords")
-            );
-
-            modelMatrix = new Matrix4();
-            modelMatrix.idt();
-            modelMatrix.translate(this.getGlobalX(), this.getGlobalY(), this.getGlobalZ());
-            modelMatrix.rotate(Vector3.Y, dir);
-
-            float[] vertices = {
-                    0.13f, 0.38f, 0f, 0f, 0f,  // Bottom-left (position and UV)
-                    0.87f, 0.38f, 0f, 1f, 0f,  // Bottom-right
-                    0.87f, 0.81f, 0f, 1f, 1f,  // Top-right
-                    0.13f, 0.81f, 0f, 0f, 1f   // Top-left
-            };
-            short[] indices;
-            if(dir == 0) {
-                indices = new short[]{0, 1, 2, 2, 3, 0};
-                modelMatrix.translate(new Vector3(0f,0f,0.568f));
-                flip = 1;
-            }
-            else if(dir == 90) {
-                indices = new short[]{2, 1, 0, 0, 3, 2};
-                modelMatrix.translate(new Vector3(-1f,0f,0.43f));
-            }
-            else if (dir == 180) {
-                indices = new short[]{0, 1, 2, 2, 3, 0};
-                modelMatrix.translate(new Vector3(-1f,0f,-0.43f));
-                flip = 1;
-            }
-            else if(dir == 270) {
-                indices = new short[]{0, 1, 2, 2, 3, 0};
-                modelMatrix.translate(new Vector3());
-            }
-            else {
-                indices = new short[]{2, 1, 0, 0, 3, 2};
-                modelMatrix.translate(new Vector3(0f,0f,-0.568f));
-            }
-            mesh.setVertices(vertices);
-            mesh.setIndices(indices);
-
-            fbo = new FrameBuffer(Pixmap.Format.RGBA8888, 1000, 1000, false);
+        if (runTexture) {
+            runTexture = false;
             generateTextMesh();
+        }
+        if(mesh == null) {
+            return;
+            //generateTextMesh();
         }
         Matrix4 tmp = new Matrix4().idt();
        // if(runTexture) texture = buildTexture();
@@ -335,7 +340,7 @@ private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
         super.onRemove();
         mesh.dispose();
         //texture.dispose();
-        fbo.dispose();
+        //fbo.dispose();
     }
 
     public Texture buildTexture() {
@@ -412,7 +417,9 @@ private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
                         "   if (u_flipX == 1) {\n" +
                         "        flippedTexCoord.x = 1.0 - v_texCoords.x;\n" +
                         "   }" +
-                        "gl_FragColor = texture2D(u_texture, flippedTexCoord); } \n";
+                        "vec4 color = texture(u_texture, flippedTexCoord);" +
+                        "if (color.a < 0.1) {discard;}" +
+                        "gl_FragColor = color; } \n";
         shader = new ShaderProgram(vertexShader, fragmentShader);
         if (!shader.isCompiled()) {
             String log = SignBlockEntity.shader.getLog();
