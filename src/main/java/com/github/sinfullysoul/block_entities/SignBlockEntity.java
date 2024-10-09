@@ -33,6 +33,8 @@ import finalforeach.cosmicreach.ui.FontRenderer;
 import finalforeach.cosmicreach.util.Identifier;
 import finalforeach.cosmicreach.world.Zone;
 
+import java.util.ArrayList;
+
 import static com.github.puzzle.game.ui.font.CosmicReachFont.createCosmicReachFont;
 
 public class SignBlockEntity extends BlockEntity implements IRenderable {
@@ -119,30 +121,68 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
 private Vector2 getCharUv(char c) {
 
         Vector2 tmp = new Vector2();
-    TextureRegion tr = CosmicReachFont.FONT.getRegion();
 
-    int width = tr.getRegionWidth();
-    int height = tr.getRegionHeight();
-    tmp.x = (float)(c  % 16);
+
+    tmp.x = (float)(c  % 16); // i think this just has to be hardcoded
     tmp.y = (float)(c / 16) ;
 
     return tmp;
 }
+ float CHAR_SIZE_X;
+    float CHAR_SIZE_Y;
+    int line;
+private void addCharacterQuad(ArrayList<Float> verts, char c, int pos) {
+
+
+    float u = CHAR_SIZE_X * (float)(c % 16); // i think this just has to be hardcoded
+    float v = CHAR_SIZE_Y * (float)(c / 16);
+
+    float OFFSET_X = pos * CHAR_SIZE_X; //this has to be the size of the char * scale i think
+
+
+    float x = -0.5f + OFFSET_X;
+    float y = -0.5f + 0f; //TODO add line offset
+    float z = 0.075f;
+
+    verts.add( x); // x1
+    verts.add( y); // y1
+    verts.add( z);
+    verts.add( u); // u1
+    verts.add( u + CHAR_SIZE_Y); // v1 //done like this because the image is flipped
+
+    verts.add( x + 1f); // x2
+    verts.add( y); // y2
+    verts.add( z);
+    verts.add( u + CHAR_SIZE_X); // u2
+    verts.add( v + CHAR_SIZE_Y); // v2
+
+    verts.add( x + 1f); // x3
+    verts.add( y + 1f); // y3
+    verts.add( z);
+    verts.add( u + CHAR_SIZE_X); // u3
+    verts.add( v ); // v3
+
+    verts.add( x); // x4
+    verts.add( y + 1f); // y4
+    verts.add( z);
+    verts.add( u ); // u4
+    verts.add( v ); // v4
+
+
+
+}
     private void generateTextMesh() {
-        int x = this.getGlobalX();
-        int y = this.getGlobalY();
-        int z = this.getGlobalZ();
-        int x2;
-        int y2;
-        int z2;
-        int x1;
-        int y1;
-        int z1; //
+        int gx = this.getGlobalX();
+        int gy = this.getGlobalY();
+        int gz = this.getGlobalZ();
+
         float[] verts = new float[20];
 
         int i = 0;
          float SIZE_X = 16f / CosmicReachFont.FONT.getRegion().getRegionWidth();
+         CHAR_SIZE_X = SIZE_X;
          float SIZE_Y = 16f / CosmicReachFont.FONT.getRegion().getRegionHeight();
+         CHAR_SIZE_Y = SIZE_Y;
          //SIZE_Y = 1.0f;
          //SIZE_X = 1.0f;
         Vector2 uv = getCharUv('A');
@@ -155,28 +195,34 @@ private Vector2 getCharUv(char c) {
         Constants.LOGGER.info("{} SIZE{}", SIZE_X, SIZE_Y);
         short[] indices;
         modelMatrix = new Matrix4().idt();
-        if(dir == 0) {
-            indices = new short[]{0, 1, 2, 2, 3, 0};
-            modelMatrix.translate(new Vector3(0f,0f,0.568f));
-            x2 = 0;
+        float rotation ;
+        if (dir == -90 ) {
+            rotation =90;
+        } else if(dir == 90) {
+            rotation = 270;
+        } else {
+            rotation = dir;
         }
-        else if(dir == 90) {
-            indices = new short[]{2, 1, 0, 0, 3, 2};
-            modelMatrix.translate(new Vector3(-1f,0f,0.43f));
-        }
-        else if (dir == 180) {
-            indices = new short[]{0, 1, 2, 2, 3, 0};
-            modelMatrix.translate(new Vector3(-1f,0f,-0.43f));
-            flip = 1;
-        }
-        else if(dir == 270) {
-            indices = new short[]{0, 1, 2, 2, 3, 0};
-            modelMatrix.translate(new Vector3());
-        }
-        else {
-            indices = new short[]{2, 1, 0, 0, 3, 2};
-            modelMatrix.translate(new Vector3(0f,0f,-0.568f));
-        }
+
+        modelMatrix.rotate(new Vector3(0,1,0), rotation);
+        float FONT_SCALE = 0.1f;
+        modelMatrix.scale(FONT_SCALE,FONT_SCALE,1.0f);
+        modelMatrix.trn(gx + 0.5f,gy + 0.5f,gz + 0.5f); // add 0.5f to center on the block
+
+        Vector3 pos = new Vector3(1,1,1).mul(modelMatrix); //model matrix time vertex position
+        Constants.LOGGER.info("ROTATION {}", dir);
+
+
+        Constants.LOGGER.info(modelMatrix);
+
+        Constants.LOGGER.info(pos);
+        indices = new short[]{0, 1, 2, 2, 3, 0};
+        float X_OFFSET = 0.0f;
+        float Y_OFFSET = 0.5f; //offset is affected by the scale in model Matrix
+       float x = -0.5f + X_OFFSET;
+        float y = -0.5f + Y_OFFSET;
+        float z = 0.075f; //TODO maybe find a better way to do this so there isnt z fighting but not to far off the sign
+
         verts[i++] = x; // x1
         verts[i++] = y; // y1
         verts[i++] = z;
@@ -273,7 +319,7 @@ private Vector2 getCharUv(char c) {
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);
         shader.begin();
         shader.setUniformMatrix("u_projTrans", camera.combined);
-        shader.setUniformMatrix("u_modelMatrix", tmp);
+        shader.setUniformMatrix("u_modelMatrix", modelMatrix);
         shader.setUniformi("u_flipX", 0);
         texture.bind(0);
         shader.setUniformi("u_texture", 0);
