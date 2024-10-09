@@ -9,7 +9,8 @@
     "ControlsMixin",
     "InGameMixin",
     "ZoneMixin",
-    "GameShaderMixin"
+    "GameShaderMixin",
+    "BlockEntityInterface"
   ],
   "client": [],
   "server": [],

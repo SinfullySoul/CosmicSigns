@@ -3,6 +3,7 @@ package com.github.sinfullysoul.mixins;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.utils.Array;
 import com.github.sinfullysoul.api.IRenderable;
+import com.github.sinfullysoul.entities.TextModelInstance;
 import finalforeach.cosmicreach.world.Chunk;
 import finalforeach.cosmicreach.world.Region;
 import finalforeach.cosmicreach.world.Zone;
@@ -27,5 +28,15 @@ public abstract class ZoneMixin implements IRenderable {
                 }
             }
         }
+    }
+
+
+    public Array<TextModelInstance> allTextModels;
+
+    public void addTextModel(TextModelInstance text) {
+        this.allTextModels.add(text);
+    }
+    public void removeTextModel(TextModelInstance text) {
+        this.allTextModels.removeValue(text, true);
     }
 }

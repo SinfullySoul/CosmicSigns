@@ -1,6 +1,7 @@
 package com.github.sinfullysoul.mixins;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.github.sinfullysoul.Constants;
 import com.github.sinfullysoul.api.IRenderable;
 import finalforeach.cosmicreach.blockentities.BlockEntity;
 import finalforeach.cosmicreach.util.IPoint3DMap;
