@@ -245,10 +245,11 @@ private void buildMesh() {
     }
 
     modelMatrix.rotate(new Vector3(0,1,0), rotation);
-    float FONT_SCALE = 0.1f;
+    float fontsize = 10f;
+    float FONT_SCALE = 1.0f / fontsize; //TODO move this to TextModel and just make a call that updates modelMatrix with a given rotation
     modelMatrix.scale(FONT_SCALE,FONT_SCALE,1.0f);
     modelMatrix.trn(gx + 0.5f,gy + 0.5f,gz + 0.5f);
-    this.textModel.buildTextMesh(this.texts);
+    this.textModel.buildTextMesh(this.texts, 0f,1.0f,0.075f, fontsize, true);
 }
 //    private void generateTextMesh() {
 //        int gx = this.getGlobalX();
