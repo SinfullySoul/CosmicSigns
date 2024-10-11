@@ -3,40 +3,47 @@ package com.github.sinfullysoul.mixins;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.utils.Array;
 import com.github.sinfullysoul.api.IRenderable;
-import com.github.sinfullysoul.entities.TextModelInstance;
-import finalforeach.cosmicreach.world.Chunk;
+import com.github.sinfullysoul.block_entities.ZoneBlockEntityRenderInterface;
+import finalforeach.cosmicreach.blockentities.BlockEntity;
 import finalforeach.cosmicreach.world.Region;
 import finalforeach.cosmicreach.world.Zone;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Zone.class)
-public abstract class ZoneMixin implements IRenderable {
+public abstract class ZoneMixin implements IRenderable, ZoneBlockEntityRenderInterface {
 
     @Shadow public abstract Region[] getRegions();
 
     @Override
     public void onRender(Camera camera) {
-        Region[] regions = this.getRegions();
-        for(Region region : regions){
-            if(region == null) continue;
-            Array<Chunk> chunkArray = region.getChunks();
-            for(Chunk chunk : chunkArray) {
-                if(chunk == null) continue;
-                if (chunk instanceof IRenderable renderable) {
-                    renderable.onRender(camera);
-                }
-            }
-        }
+//        Region[] regions = this.getRegions();
+//        for(Region region : regions){
+//            if(region == null) continue;
+//            Array<Chunk> chunkArray = region.getChunks();
+//            for(Chunk chunk : chunkArray) {
+//                if(chunk == null) continue;
+//                if (chunk instanceof IRenderable renderable) {
+//                    renderable.onRender(camera);
+//                }
+//            }
+//        }
     }
 
 
-    public Array<TextModelInstance> allTextModels;
+    public Array<BlockEntity> allRenderableBlockEntities = new Array<>();
 
-    public void addTextModel(TextModelInstance text) {
-        this.allTextModels.add(text);
+    @Override
+    public  void addRenderableBlockEntity(BlockEntity be) {
+        this.allRenderableBlockEntities.add(be);
     }
-    public void removeTextModel(TextModelInstance text) {
-        this.allTextModels.removeValue(text, true);
+    @Override
+    public  void removeRenderableBlockEntity(BlockEntity be) {
+        this.allRenderableBlockEntities.removeValue(be, true);
+    }
+    @Override
+    public  Array<BlockEntity> getRenderableBlockEntities(){
+
+        return this.allRenderableBlockEntities;
     }
 }

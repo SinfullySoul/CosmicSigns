@@ -1,7 +1,6 @@
-package com.github.sinfullysoul.entities;
+package com.github.sinfullysoul.block_entities.models;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Matrix4;
@@ -9,17 +8,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ShortArray;
 import com.github.puzzle.game.ui.font.CosmicReachFont;
-import com.github.sinfullysoul.Constants;
-import com.github.sinfullysoul.block_entities.SignBlockEntity;
-import com.github.sinfullysoul.rendering.shaders.TextShader;
 import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.entities.Entity;
 import finalforeach.cosmicreach.rendering.shaders.EntityShader;
 import finalforeach.cosmicreach.rendering.shaders.GameShader;
 import finalforeach.cosmicreach.world.Zone;
-
-import java.io.Console;
-import java.util.Arrays;
 
 public class TextModelInstance {
     private static final BlockPosition tmpBlockPos1 = new BlockPosition(null, 0, 0, 0);
@@ -34,12 +27,14 @@ public class TextModelInstance {
     private Color tintColor;
     public boolean glowing = false;
     private float fontSize;
+    private Matrix4 modelMat = new Matrix4();
+    public float rotationY; //for now just the y rotation can add more in future
 
     public GameShader shader = EntityShader.ENTITY_SHADER; //im pretty sure this can just use entity shader until it changes
 
 
 
-    public TextModelInstance( Zone zone, Vector3 pos, Color textColor) { //I can let BlockEntity handle unloading loading and updating text this just has to be saved in an array in a playerzone in inGame to render all the textModels
+    public TextModelInstance( Zone zone, Vector3 pos, Color textColor,float fontSize) { //I can let BlockEntity handle unloading loading and updating text this just has to be saved in an array in a playerzone in inGame to render all the textModels
         this.zone = zone;
         this.position = pos;
         this.modelLightColor = new Color(Color.WHITE);
@@ -47,13 +42,22 @@ public class TextModelInstance {
         this.mesh = null;
         this.texture = CosmicReachFont.FONT.getRegion().getTexture();
         this.tintColor = new Color(Color.RED);
+        this.fontSize = fontSize;
        // Entity.setLightingColor(); //run each time chunk is updated but not sure when to call that so i could just do it every render
         CHAR_UV_X = 16f / CosmicReachFont.FONT.getRegion().getRegionWidth(); //TODO CHANGE THIS
 
         CHAR_UV_Y = 16f / CosmicReachFont.FONT.getRegion().getRegionHeight() ;
-
     }
-    public void render(Camera worldCamera, Matrix4 modelMat) { //im gonna keep this out of this class so the block entity has the potential to do ticking stuff with it ex rotating sign/hologram?
+    public void update() {
+        this.modelMat.idt();
+
+        modelMat.rotate(new Vector3(0,1,0), this.rotationY);
+        float fontsize = this.fontSize;
+        float FONT_SCALE = 1.0f / fontsize; //TODO move this to TextModel and just make a call that updates modelMatrix with a given rotation
+        modelMat.scale(FONT_SCALE,FONT_SCALE,1.0f);
+        modelMat.trn(position.x + 0.5f,position.y + 0.5f,position.z + 0.5f);
+    }
+    public void render(Camera worldCamera) { //im gonna keep this out of this class so the block entity has the potential to do ticking stuff with it ex rotating sign/hologram?
 
         if(mesh == null) {
             return;
@@ -87,7 +91,7 @@ public class TextModelInstance {
         if (mesh != null) {
             mesh.dispose();
         }
-
+       // ((ZoneBlockEntityRenderInterface)this.zone).removeTextModel(this); //idk if this works
     }
 
     //border at -0.35 * font x
@@ -132,10 +136,7 @@ public class TextModelInstance {
                 for(int x = 0; x < texts[l].length(); x++) {
 
                     stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(texts[l].charAt(x)).xadvance;
-//                    if(firstPass) {
-//                        stringPixelLength+= stringPixelLength / 2 ;
-//                        firstPass = false;
-//                    }
+
                 }
 
 
@@ -187,10 +188,7 @@ public class TextModelInstance {
 //        Constants.LOGGER.info("X advance {}, srcx {}", glyph.xadvance,glyph.srcX);
         float advance = glyph.xadvance / 2.0f;
 
-//        float u = glyph.u;
-//        float v = glyph.v;
-//        float u2 = glyph.u2;
-//        float v2 = glyph.v2;
+
         float x = fontSize * xStart + (pos + advance) / 16f;//divide by the char size  pos is in
         float y = fontSize * yStart - line ; //TODO add line offset
         float z = zStart;
