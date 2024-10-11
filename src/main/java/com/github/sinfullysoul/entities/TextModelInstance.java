@@ -26,7 +26,7 @@ public class TextModelInstance {
     private static final BlockPosition tmpBlockPos2 = new BlockPosition(null, 0, 0, 0);
     public Color modelLightColor;
 
-    public Color textColor;
+    public final Color textColor = new Color(Color.BLACK);
     Vector3 position;
     private Zone zone;
     private Mesh mesh;
@@ -42,11 +42,11 @@ public class TextModelInstance {
     public TextModelInstance( Zone zone, Vector3 pos, Color textColor) { //I can let BlockEntity handle unloading loading and updating text this just has to be saved in an array in a playerzone in inGame to render all the textModels
         this.zone = zone;
         this.position = pos;
-        this.modelLightColor = Color.WHITE;
-        this.textColor = textColor;
+        this.modelLightColor = new Color(Color.WHITE);
+        this.textColor.set(textColor);
         this.mesh = null;
         this.texture = CosmicReachFont.FONT.getRegion().getTexture();
-        this.tintColor = Color.RED;
+        this.tintColor = new Color(Color.RED);
        // Entity.setLightingColor(); //run each time chunk is updated but not sure when to call that so i could just do it every render
         CHAR_UV_X = 16f / CosmicReachFont.FONT.getRegion().getRegionWidth(); //TODO CHANGE THIS
 
@@ -60,14 +60,15 @@ public class TextModelInstance {
         }
         Entity.setLightingColor(zone,position,textColor,tintColor,tmpBlockPos1,tmpBlockPos2); //TODO doesnt quite work with colors
         //this.modelLightColor =
-//        if (this.glowing) {
-//            this.tintColor.set(this.textColor);
-//        } else {
-//            mixTint(this.tintColor, this.textColor, this.modelLightColor);
-//        }
+        if (this.glowing) {
+            this.tintColor.set(this.textColor);
+        } else {
+           //mixTint(this.tintColor, this.textColor, this.modelLightColor);
+            this.tintColor.mul(textColor);
+        }
         this.shader.bind(worldCamera);
         this.shader.bindOptionalTexture("texDiffuse", this.texture, 0);
-        this.shader.bindOptionalUniform4f("tintColor", this.tintColor.mul(1.5f));
+        this.shader.bindOptionalUniform4f("tintColor", this.tintColor.mul(1.0f));
         this.shader.bindOptionalMatrix4("u_modelMat", modelMat);
         this.mesh.render(this.shader.shader, GL20.GL_TRIANGLES);
         this.shader.unbind();
@@ -92,8 +93,9 @@ public class TextModelInstance {
     //border at -0.35 * font x
     //0.2f * font y
 
-    public void buildCenteredTextMesh(String[] texts, float zStart, float fontSize) { //centered at 0,0
-        buildTextMesh(texts,0.0f,0.0f,zStart,fontSize, isCentered);
+
+    public void setTextColor(Color color) {
+        this.textColor.set(color);
     }
     public void buildTextMesh(String[] texts, float xStart, float yStart, float zStart, float fontSize, boolean centered) {
         if (mesh!= null) {
@@ -115,8 +117,8 @@ public class TextModelInstance {
             return;
         }
 
-        Constants.LOGGER.info(Arrays.toString(texts));
-        Constants.LOGGER.info(length);
+//        Constants.LOGGER.info(Arrays.toString(texts));
+//        Constants.LOGGER.info(length);
         FloatArray verts = new FloatArray( length * 4 * 5); //character length * vertexes * vertex attributes
         ShortArray indicies = new ShortArray(length * 6);
         charCounter = 0;
@@ -138,15 +140,15 @@ public class TextModelInstance {
 
 
                // this.xStart = -xStart -  texts[l].length() / (2f *  fontSize)  ;
-                this.xStart = -xStart -  (stringPixelLength / 16f) / (2f *  fontSize) - 0.5f / fontSize ; // subtract one half font size character to center on block
-                Constants.LOGGER.info("Pixel Length {} XSTART {} ", stringPixelLength,this.xStart);
+                this.xStart = -xStart -  (stringPixelLength / 16f) / (2f *  fontSize) - 0.5f / fontSize ; // subtract one half font size character to center on block center
+                //Constants.LOGGER.info("Pixel Length {} XSTART {} ", stringPixelLength,this.xStart);
             }
             float charPos = 0;
             for(int i = 0; i < texts[l].length(); i++ ) {
                 //need to calculate the offset for each line x for centered
 
               charPos =  addCharacterQuad(verts, indicies, texts[l].charAt(i),charPos, l);
-              Constants.LOGGER.info("CHARPOS {}", charPos);
+              //Constants.LOGGER.info("CHARPOS {}", charPos);
 
             }
         }
@@ -156,14 +158,14 @@ public class TextModelInstance {
                 new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
                 new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0")
         );
-        Constants.LOGGER.info("TEXTMODEL {}", verts.items.length);
-        Constants.LOGGER.info(Arrays.toString(verts.items));
+//        Constants.LOGGER.info("TEXTMODEL {}", verts.items.length);
+//        Constants.LOGGER.info(Arrays.toString(verts.items));
 
         mesh.setVertices(verts.items);
 
 
         mesh.setIndices(indicies.items);
-        Constants.LOGGER.info(mesh.getNumVertices());
+//        Constants.LOGGER.info(mesh.getNumVertices());
     }
     float CHAR_UV_X;
     float CHAR_UV_Y;
@@ -180,9 +182,9 @@ public class TextModelInstance {
 
 
         BitmapFont.Glyph glyph = CosmicReachFont.FONT.getData().getGlyph(c);
-        Constants.LOGGER.info("U {} U2 {} Width: {}", glyph.u, glyph.u2, glyph.width);
-        Constants.LOGGER.info("curernt U {} U2 {} ", u, u + CHAR_UV_X);
-        Constants.LOGGER.info("X advance {}, srcx {}", glyph.xadvance,glyph.srcX);
+//        Constants.LOGGER.info("U {} U2 {} Width: {}", glyph.u, glyph.u2, glyph.width);
+//        Constants.LOGGER.info("curernt U {} U2 {} ", u, u + CHAR_UV_X);
+//        Constants.LOGGER.info("X advance {}, srcx {}", glyph.xadvance,glyph.srcX);
         float advance = glyph.xadvance / 2.0f;
 
 //        float u = glyph.u;
@@ -192,8 +194,8 @@ public class TextModelInstance {
         float x = fontSize * xStart + (pos + advance) / 16f;//divide by the char size  pos is in
         float y = fontSize * yStart - line ; //TODO add line offset
         float z = zStart;
-        Constants.LOGGER.info("CHAR {}", c);
-        Constants.LOGGER.info("NEW QUAD X POS {} Y POS {}",x,y);
+//        Constants.LOGGER.info("CHAR {}", c);
+//        Constants.LOGGER.info("NEW QUAD X POS {} Y POS {}",x,y);
 
 
         verts.add( x); // x1

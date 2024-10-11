@@ -50,8 +50,10 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
 
     public boolean runTexture = true;
     public String[] texts = new String[]{"", "", ""};
-    public float textSize = 14f;
-    public Color fontcolor = Color.BLACK;
+    public float textSize = 6f;
+    public Color fontcolor = new Color(Color.BLACK);
+
+
 
     //private Texture texture;
    // public static ShaderProgram shader = null;
@@ -126,7 +128,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
         dir = blockState.rotXZ;
         dir -= 90;
         //Gdx.app.postRunnable(this::generateTextMesh);
-        Gdx.app.postRunnable(this::buildMesh);
+       // Gdx.app.postRunnable(this::buildMesh);
 
     }
 
@@ -229,8 +231,9 @@ private void addCharacterQuad(FloatArray verts, ShortArray indices, char c, int 
 //}
 private void buildMesh() {
     if (this.textModel == null) {
-        this.textModel = new TextModelInstance( ((BlockEntityInterface)this).getZone(), new Vector3(this.getGlobalX(),this.getGlobalY(), this.getGlobalZ()), Color.BLUE    );
+        this.textModel = new TextModelInstance( ((BlockEntityInterface)this).getZone(), new Vector3(this.getGlobalX(),this.getGlobalY(), this.getGlobalZ()), new Color(Color.BLUE )   );
     }
+    textModel.setTextColor(this.fontcolor);
     modelMatrix = new Matrix4().idt();
     int gx = this.getGlobalX();
     int gy = this.getGlobalY();
@@ -245,7 +248,7 @@ private void buildMesh() {
     }
 
     modelMatrix.rotate(new Vector3(0,1,0), rotation);
-    float fontsize = 10f;
+    float fontsize = this.textSize;
     float FONT_SCALE = 1.0f / fontsize; //TODO move this to TextModel and just make a call that updates modelMatrix with a given rotation
     modelMatrix.scale(FONT_SCALE,FONT_SCALE,1.0f);
     modelMatrix.trn(gx + 0.5f,gy + 0.5f,gz + 0.5f);
@@ -349,15 +352,18 @@ private void buildMesh() {
     @Override
     public void onRender(Camera camera) {
         if(camera == null) return;
+
         if (runTexture) {
             runTexture = false;
             //generateTextMesh();
             buildMesh();
         }
+
 //        if(mesh == null) {
 //            return;
 //            //generateTextMesh();
 //        }
+        //textModel.setTextColor(this.fontcolor);
         Matrix4 tmp = new Matrix4().idt();
        // if(runTexture) texture = buildTexture();
         Gdx.gl.glDisable(GL20.GL_CULL_FACE);
@@ -437,7 +443,7 @@ private void buildMesh() {
         Threads.runOnMainThread(() -> {
             BitmapFont font = createCosmicReachFont();
             font.getData().setScale(14);
-            signbasefont = new Label.LabelStyle(font, Color.BLACK);
+            signbasefont = new Label.LabelStyle(font, new Color(Color.BLACK));
         });
     }
     public static void initSignShader() {
@@ -468,5 +474,19 @@ private void buildMesh() {
 //            String log = SignBlockEntity.shader.getLog();
 //            throw new RuntimeException( "Sign Shader is not compiled!\n" + log);
 //        }
+    }
+
+    public int isTextMaxSize( String newString) { // just easier to recalculate the length each time definitly possible to keep track of the length as the string grows and shrinks
+        int stringPixelLength =0;
+        for(int x = 0; x < newString.length(); x++) {
+            stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(newString.charAt(x)).xadvance;
+            float MAX_TEXT_LENGTH = 10f;
+            if (stringPixelLength / this.textSize > MAX_TEXT_LENGTH) {
+                Constants.LOGGER.info("String {} , pixelLength {}, Out {}",newString, stringPixelLength, x);
+                return x; //return the index of the character that exceeds the font max length
+            }
+        }
+        return -1; //return -1 if it doesnt exceed the limit
+
     }
 }
