@@ -34,7 +34,7 @@ public class TextModelInstance {
 
 
 
-    public TextModelInstance( Zone zone, Vector3 pos, Color textColor,float fontSize) { //I can let BlockEntity handle unloading loading and updating text this just has to be saved in an array in a playerzone in inGame to render all the textModels
+    public TextModelInstance( Zone zone, Vector3 pos, Color textColor,float fontSize) {
         this.zone = zone;
         this.position = pos;
         this.modelLightColor = new Color(Color.WHITE);
@@ -43,9 +43,7 @@ public class TextModelInstance {
         this.texture = CosmicReachFont.FONT.getRegion().getTexture();
         this.tintColor = new Color(Color.RED);
         this.fontSize = fontSize;
-       // Entity.setLightingColor(); //run each time chunk is updated but not sure when to call that so i could just do it every render
         CHAR_UV_X = 16f / CosmicReachFont.FONT.getRegion().getRegionWidth(); //TODO CHANGE THIS
-
         CHAR_UV_Y = 16f / CosmicReachFont.FONT.getRegion().getRegionHeight() ;
     }
     public void update() {
@@ -53,21 +51,19 @@ public class TextModelInstance {
 
         modelMat.rotate(new Vector3(0,1,0), this.rotationY);
         float fontsize = this.fontSize;
-        float FONT_SCALE = 1.0f / fontsize; //TODO move this to TextModel and just make a call that updates modelMatrix with a given rotation
+        float FONT_SCALE = 1.0f / fontsize;
         modelMat.scale(FONT_SCALE,FONT_SCALE,1.0f);
         modelMat.trn(position.x + 0.5f,position.y + 0.5f,position.z + 0.5f);
     }
-    public void render(Camera worldCamera) { //im gonna keep this out of this class so the block entity has the potential to do ticking stuff with it ex rotating sign/hologram?
+    public void render(Camera worldCamera) {
 
         if(mesh == null) {
             return;
         }
         Entity.setLightingColor(zone,position,textColor,tintColor,tmpBlockPos1,tmpBlockPos2); //TODO doesnt quite work with colors
-        //this.modelLightColor =
         if (this.glowing) {
             this.tintColor.set(this.textColor);
         } else {
-           //mixTint(this.tintColor, this.textColor, this.modelLightColor);
             this.tintColor.mul(textColor);
         }
         this.shader.bind(worldCamera);
@@ -77,25 +73,12 @@ public class TextModelInstance {
         this.mesh.render(this.shader.shader, GL20.GL_TRIANGLES);
         this.shader.unbind();
     }
-    public void setTint(float r, float g, float b, float a) {
-        this.tintColor.set(r, g, b, a);
-    }
-    public void mixTint(Color c0, Color c1, Color c2) {
-        c0.r = c1.r * c2.r;
-        c0.g = c1.g * c2.g;
-        c0.b = c1.b * c2.b;
-        c0.a = c1.a * c2.a;
-    }
 
     public void dispose() {
         if (mesh != null) {
             mesh.dispose();
         }
-       // ((ZoneBlockEntityRenderInterface)this.zone).removeTextModel(this); //idk if this works
     }
-
-    //border at -0.35 * font x
-    //0.2f * font y
 
 
     public void setTextColor(Color color) {
@@ -121,8 +104,7 @@ public class TextModelInstance {
             return;
         }
 
-//        Constants.LOGGER.info(Arrays.toString(texts));
-//        Constants.LOGGER.info(length);
+
         FloatArray verts = new FloatArray( length * 4 * 5); //character length * vertexes * vertex attributes
         ShortArray indicies = new ShortArray(length * 6);
         charCounter = 0;
@@ -132,48 +114,32 @@ public class TextModelInstance {
         for (int l = 0; l<texts.length; l++) {
             if(isCentered) {
                 int stringPixelLength =0;
-                boolean firstPass = true;
+
                 for(int x = 0; x < texts[l].length(); x++) {
 
                     stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(texts[l].charAt(x)).xadvance;
 
                 }
-
-
-               // this.xStart = -xStart -  texts[l].length() / (2f *  fontSize)  ;
                 this.xStart = -xStart -  (stringPixelLength / 16f) / (2f *  fontSize) - 0.5f / fontSize ; // subtract one half font size character to center on block center
-                //Constants.LOGGER.info("Pixel Length {} XSTART {} ", stringPixelLength,this.xStart);
+
             }
             float charPos = 0;
             for(int i = 0; i < texts[l].length(); i++ ) {
-                //need to calculate the offset for each line x for centered
-
               charPos =  addCharacterQuad(verts, indicies, texts[l].charAt(i),charPos, l);
-              //Constants.LOGGER.info("CHARPOS {}", charPos);
 
             }
         }
-
-
         mesh = new Mesh(false, verts.size, indicies.size,
                 new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
                 new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0")
         );
-//        Constants.LOGGER.info("TEXTMODEL {}", verts.items.length);
-//        Constants.LOGGER.info(Arrays.toString(verts.items));
-
         mesh.setVertices(verts.items);
-
-
         mesh.setIndices(indicies.items);
-//        Constants.LOGGER.info(mesh.getNumVertices());
     }
     float CHAR_UV_X;
     float CHAR_UV_Y;
     short charCounter;
     float xStart,  yStart,  zStart;
-    float lineSpacing; //would depend on the font scale
-
     boolean isCentered = true;
     private float addCharacterQuad(FloatArray verts, ShortArray indices, char c, float pos, int line) {
 
@@ -230,9 +196,7 @@ public class TextModelInstance {
         indices.add(offset);
         charCounter+= 4;
 
-//        if(advance <= 4) {
-//            advance += 8;
-//        }
-        return pos + advance * 2.0f; //add a constant 2 for spacing
+
+        return pos + advance * 2.0f;
     }
 }

@@ -34,8 +34,6 @@ public class SignScreen extends BasePuzzleScreen {
     static final String baseText = "line ";
     static Drawable buttonRight;
     static Drawable buttonLeft;
-
-    public int texts1StringSize = 0;
     public SignBlockEntity entity;
     private String[] texts;
 
@@ -71,18 +69,13 @@ public class SignScreen extends BasePuzzleScreen {
                 //do updates only if the lengths arent equal
                 if(currentLength < line1.getText().length()){ //if new text size is greater than we need to check if it reaches the max size
                     int addedLength = this.entity.isTextMaxSize(line1.getText());
-                    if( addedLength > 0 ) { //pass in the added characters to apend to the texts1String
-                        line1.setText(line1.getText().substring(0,addedLength)); //added length is already > 0 < length
-
-
-                        //needs to prevent the update from happening
-                        // i dont need to calculate the entire thing just the glyphs that were added and update the counter
+                    if( addedLength > 0 ) {
+                        line1.setText(this.texts[0]); //set to the last working string
 
                     }
                 }
 
                 this.texts[0] = line1.getText();
-                Constants.LOGGER.info(line1.getText());
             }
 
             return false;
@@ -94,21 +87,13 @@ public class SignScreen extends BasePuzzleScreen {
         line2.addListener(listener -> {
             int currentLength = this.texts[1].length();
             if(currentLength != line2.getText().length()) {
-                //do updates only if the lengths arent equal
-                if(currentLength < line2.getText().length()){ //if new text size is greater than we need to check if it reaches the max size
+                if (currentLength < line2.getText().length()) {
                     int addedLength = this.entity.isTextMaxSize(line2.getText());
-                    if( addedLength > 0 ) { //pass in the added characters to apend to the texts1String
-                        line2.setText(line2.getText().substring(0,addedLength)); //added length is already > 0 < length
-
-
-                        //needs to prevent the update from happening
-                        // i dont need to calculate the entire thing just the glyphs that were added and update the counter
-
+                    if (addedLength > 0) {
+                        line2.setText(this.texts[1]);
                     }
                 }
-
                 this.texts[1] = line2.getText();
-
             }
 
             return false;
@@ -120,21 +105,13 @@ public class SignScreen extends BasePuzzleScreen {
         line3.addListener(listener -> {
             int currentLength = this.texts[2].length();
             if(currentLength != line3.getText().length()) {
-                //do updates only if the lengths arent equal
-                if(currentLength < line3.getText().length()){ //if new text size is greater than we need to check if it reaches the max size
+                if(currentLength < line3.getText().length()){
                     int addedLength = this.entity.isTextMaxSize(line3.getText());
-                    if( addedLength > 0 ) { //pass in the added characters to apend to the texts1String
-                        line3.setText(line3.getText().substring(0,addedLength)); //added length is already > 0 < length
-
-
-                        //needs to prevent the update from happening
-                        // i dont need to calculate the entire thing just the glyphs that were added and update the counter
-
+                    if( addedLength > 0 ) {
+                        line3.setText(this.texts[2]);
                     }
                 }
-
                 this.texts[2] = line3.getText();
-                Constants.LOGGER.info(line3.getText());
             }
 
             return false;

@@ -163,7 +163,7 @@ private void buildMesh() {
     }
 
 
-    //todo this always removes the end of the string instead of the character /characters trying to be added
+
     public int isTextMaxSize( String newString) { // just easier to recalculate the length each time definitly possible to keep track of the length as the string grows and shrinks
         int stringPixelLength =0;
         for(int x = 0; x < newString.length(); x++) {
