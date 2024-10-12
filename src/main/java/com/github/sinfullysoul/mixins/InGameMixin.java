@@ -19,7 +19,7 @@ public class InGameMixin {
     @Shadow
     private static PerspectiveCamera rawWorldCamera;
 
-    private static boolean firstrender = false;
+
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lfinalforeach/cosmicreach/BlockSelection;render(Lcom/badlogic/gdx/graphics/Camera;)V", shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD)
     private void renderPlayerZone(CallbackInfo ci, Zone playerZone, Sky sky) {

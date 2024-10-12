@@ -148,17 +148,12 @@ public class TextModelInstance {
 
 
         BitmapFont.Glyph glyph = CosmicReachFont.FONT.getData().getGlyph(c);
-//        Constants.LOGGER.info("U {} U2 {} Width: {}", glyph.u, glyph.u2, glyph.width);
-//        Constants.LOGGER.info("curernt U {} U2 {} ", u, u + CHAR_UV_X);
-//        Constants.LOGGER.info("X advance {}, srcx {}", glyph.xadvance,glyph.srcX);
         float advance = glyph.xadvance / 2.0f;
 
 
         float x = fontSize * xStart + (pos + advance) / 16f;//divide by the char size  pos is in
         float y = (fontSize ) * yStart - line ; //TODO add line offset
         float z = zStart;
-//        Constants.LOGGER.info("CHAR {}", c);
-//        Constants.LOGGER.info("NEW QUAD X POS {} Y POS {}",x,y);
 
 
         verts.add( x); // x1

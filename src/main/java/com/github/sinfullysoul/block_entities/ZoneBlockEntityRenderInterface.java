@@ -6,7 +6,6 @@ import finalforeach.cosmicreach.blockentities.BlockEntity;
 
 //The interface cant be in mixin package
 public interface ZoneBlockEntityRenderInterface {
-    //public Array<TextModelInstance> allTextModels = new Array<>();
 
     public default void addRenderableBlockEntity(BlockEntity text) {
 
