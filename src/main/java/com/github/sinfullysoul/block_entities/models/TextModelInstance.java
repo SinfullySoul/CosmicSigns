@@ -108,8 +108,9 @@ public class TextModelInstance {
         FloatArray verts = new FloatArray( length * 4 * 5); //character length * vertexes * vertex attributes
         ShortArray indicies = new ShortArray(length * 6);
         charCounter = 0;
+        float ySpacing = Math.max(fontSize / 9f, 1.0f); //TODO dont make this hardcoded
         if(centered) {
-            this.yStart =  0.1f + (texts.length / (fontSize * 2f) - (1f / fontSize) );
+            this.yStart =  0.1f + (ySpacing * texts.length / (fontSize * 2f) - (1f / fontSize) );
         }
         for (int l = 0; l<texts.length; l++) {
             if(isCentered) {
@@ -125,7 +126,7 @@ public class TextModelInstance {
             }
             float charPos = 0;
             for(int i = 0; i < texts[l].length(); i++ ) {
-              charPos =  addCharacterQuad(verts, indicies, texts[l].charAt(i),charPos, l);
+              charPos =  addCharacterQuad(verts, indicies, texts[l].charAt(i),charPos, (float)l * ySpacing);
 
             }
         }
@@ -141,7 +142,7 @@ public class TextModelInstance {
     short charCounter;
     float xStart,  yStart,  zStart;
     boolean isCentered = true;
-    private float addCharacterQuad(FloatArray verts, ShortArray indices, char c, float pos, int line) {
+    private float addCharacterQuad(FloatArray verts, ShortArray indices, char c, float pos, float line) {
 
 
         float u = CHAR_UV_X * (float)(c % 16); // i think this just has to be hardcoded
@@ -156,7 +157,7 @@ public class TextModelInstance {
 
 
         float x = fontSize * xStart + (pos + advance) / 16f;//divide by the char size  pos is in
-        float y = fontSize * yStart - line ; //TODO add line offset
+        float y = (fontSize ) * yStart - line ; //TODO add line offset
         float z = zStart;
 //        Constants.LOGGER.info("CHAR {}", c);
 //        Constants.LOGGER.info("NEW QUAD X POS {} Y POS {}",x,y);

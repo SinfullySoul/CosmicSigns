@@ -60,7 +60,7 @@ public class SignScreen extends BasePuzzleScreen {
         Table leftButtons = new Table();
 
         TextField line1 = new TextField((texts[0]), new TextField.TextFieldStyle(style));
-        line1.setMaxLength(36);
+        line1.setMaxLength(36);//36 with smallest character is as large as the current sign can hold with smallest font 6
         line1.setAlignment(Align.center);
         line1.setMessageText(baseText + 1);
         line1.addListener(listener -> {
@@ -81,7 +81,7 @@ public class SignScreen extends BasePuzzleScreen {
             return false;
         });
         TextField line2 = new TextField((texts[1]), new TextField.TextFieldStyle(style));
-        line2.setMaxLength(36); //36 with smallest character is as large as the current sign can hold with smallest font 6
+        line2.setMaxLength(36);
         line2.setAlignment(Align.center);
         line2.setMessageText(baseText + 2);
         line2.addListener(listener -> {
@@ -131,7 +131,7 @@ public class SignScreen extends BasePuzzleScreen {
             final SignBlockEntity entity = SignScreen.this.entity;
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(entity.textSize > 6) {
+                if(entity.textSize > 7) {
                     entity.textSize -= 1;
                     entity.runTexture = true;
                 }
@@ -142,7 +142,7 @@ public class SignScreen extends BasePuzzleScreen {
             final SignBlockEntity entity = SignScreen.this.entity;
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(entity.textSize < 14) {
+                if(entity.textSize < 15) {
                     entity.textSize += 1;
                     entity.runTexture = true;
                 }

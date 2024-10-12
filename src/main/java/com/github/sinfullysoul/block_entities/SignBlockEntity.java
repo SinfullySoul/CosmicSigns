@@ -31,7 +31,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
 
     public boolean runTexture = true;
     public String[] texts = new String[]{"", "", ""};
-    public float textSize = 6f;
+    public float textSize = 7f;
     public Color fontcolor = new Color(Color.BLACK);
     private int dir;
     private TextModelInstance textModel;
@@ -103,7 +103,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
 
 private void buildMesh() {
     if (this.textModel == null) {
-        this.textModel = new TextModelInstance( ((BlockEntityInterface)this).getZone(), new Vector3(this.getGlobalX(),this.getGlobalY(), this.getGlobalZ()), new Color(Color.BLUE ), this.textSize   );
+        this.textModel = new TextModelInstance( ((BlockEntityInterface)this).getZone(), new Vector3(this.getGlobalX(),this.getGlobalY(), this.getGlobalZ()), new Color(Color.BLUE ),22f - this.textSize   );
     }
     float rotation ;
     if (dir == -90 ) {
@@ -120,8 +120,8 @@ private void buildMesh() {
 
 
 
-
-    this.textModel.buildTextMesh(this.texts, 0f,1.0f,0.075f, this.textSize, true);
+    float invertedTextSize =22f -this.textSize ; //in textModel smaller numbers result in bigger fonts so im inverting them
+    this.textModel.buildTextMesh(this.texts, 0f,1.0f,0.075f, invertedTextSize, true);
 }
 
 
@@ -168,8 +168,8 @@ private void buildMesh() {
         int stringPixelLength =0;
         for(int x = 0; x < newString.length(); x++) {
             stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(newString.charAt(x)).xadvance;
-            float MAX_TEXT_LENGTH = 10f;
-            if (stringPixelLength / this.textSize > MAX_TEXT_LENGTH) {
+            float MAX_TEXT_LENGTH = 11f;
+            if (stringPixelLength / (22F -this.textSize) > MAX_TEXT_LENGTH) {
                 Constants.LOGGER.info("String {} , pixelLength {}, Out {}",newString, stringPixelLength, x);
                 return x; //return the index of the character that exceeds the font max length
             }

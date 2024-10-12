@@ -11,25 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Zone.class)
-public abstract class ZoneMixin implements IRenderable, ZoneBlockEntityRenderInterface {
-
-    @Shadow public abstract Region[] getRegions();
-
-    @Override
-    public void onRender(Camera camera) {
-//        Region[] regions = this.getRegions();
-//        for(Region region : regions){
-//            if(region == null) continue;
-//            Array<Chunk> chunkArray = region.getChunks();
-//            for(Chunk chunk : chunkArray) {
-//                if(chunk == null) continue;
-//                if (chunk instanceof IRenderable renderable) {
-//                    renderable.onRender(camera);
-//                }
-//            }
-//        }
-    }
-
+public abstract class ZoneMixin implements  ZoneBlockEntityRenderInterface {
 
     public Array<BlockEntity> allRenderableBlockEntities = new Array<>();
 
