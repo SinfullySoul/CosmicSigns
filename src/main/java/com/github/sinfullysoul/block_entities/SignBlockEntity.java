@@ -31,7 +31,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
 
     public boolean runTexture = true;
     public String[] texts = new String[]{"", "", ""};
-    public float textSize = 7f;
+    public float textSize = 8f;
     public Color fontcolor = new Color(Color.BLACK);
     private int dir;
     private TextModelInstance textModel;
@@ -121,7 +121,7 @@ private void buildMesh() {
 
 
     float invertedTextSize =22f -this.textSize ; //in textModel smaller numbers result in bigger fonts so im inverting them
-    this.textModel.buildTextMesh(this.texts, 0f,1.0f,0.075f, invertedTextSize, true);
+    this.textModel.buildTextMesh(this.texts, 0f,0.1f,0.075f, invertedTextSize, true);
 }
 
 
@@ -137,10 +137,10 @@ private void buildMesh() {
             buildMesh();
         }
 
-        Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+        //Gdx.gl.glDisable(GL20.GL_CULL_FACE);
 
         textModel.render(camera);
-        Gdx.gl.glEnable(GL20.GL_CULL_FACE);
+        //Gdx.gl.glEnable(GL20.GL_CULL_FACE);
     }
 
 

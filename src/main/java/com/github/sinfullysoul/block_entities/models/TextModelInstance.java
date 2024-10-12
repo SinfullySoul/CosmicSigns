@@ -12,6 +12,7 @@ import finalforeach.cosmicreach.blocks.BlockPosition;
 import finalforeach.cosmicreach.entities.Entity;
 import finalforeach.cosmicreach.rendering.shaders.EntityShader;
 import finalforeach.cosmicreach.rendering.shaders.GameShader;
+import finalforeach.cosmicreach.world.Sky;
 import finalforeach.cosmicreach.world.Zone;
 
 public class TextModelInstance {
@@ -60,7 +61,8 @@ public class TextModelInstance {
         if(mesh == null) {
             return;
         }
-        Entity.setLightingColor(zone,position,textColor,tintColor,tmpBlockPos1,tmpBlockPos2); //TODO doesnt quite work with colors
+
+        Entity.setLightingColor(zone,position,Sky.currentSky.currentAmbientColor,tintColor,tmpBlockPos1,tmpBlockPos2); //TODO doesnt quite work with colors should also find out how to remove this from render
         if (this.glowing) {
             this.tintColor.set(this.textColor);
         } else {
@@ -110,7 +112,7 @@ public class TextModelInstance {
         charCounter = 0;
         float ySpacing = Math.max(fontSize / 9f, 1.0f); //TODO dont make this hardcoded
         if(centered) {
-            this.yStart =  0.1f + (ySpacing * texts.length / (fontSize * 2f) - (1f / fontSize) );
+            this.yStart =  yStart + (ySpacing * texts.length / (fontSize * 2f) - (1f / fontSize) );
         }
         for (int l = 0; l<texts.length; l++) {
             if(isCentered) {
