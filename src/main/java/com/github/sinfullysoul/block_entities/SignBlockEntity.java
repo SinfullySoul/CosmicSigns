@@ -43,7 +43,10 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
     }
     public void onTick() { //used to update the text tint so its not glowing todo find a better way to do this
         super.onTick();
-        textModel.updateLight();
+        if (textModel != null) {
+            textModel.updateLight();
+        }
+
     }
 
     @Override
