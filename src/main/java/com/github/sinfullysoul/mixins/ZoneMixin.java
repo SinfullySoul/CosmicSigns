@@ -5,14 +5,22 @@ import com.badlogic.gdx.utils.Array;
 import com.github.sinfullysoul.api.IRenderable;
 import com.github.sinfullysoul.block_entities.ZoneBlockEntityRenderInterface;
 import finalforeach.cosmicreach.blockentities.BlockEntity;
+import finalforeach.cosmicreach.util.ArrayUtils;
 import finalforeach.cosmicreach.world.Region;
 import finalforeach.cosmicreach.world.Zone;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Zone.class)
 public abstract class ZoneMixin implements  ZoneBlockEntityRenderInterface {
 
+    @Inject(method = "update", at = @At(value = "INVOKE", target = "Lfinalforeach/cosmicreach/world/Zone;runScheduledTriggers()V",shift = At.Shift.AFTER))
+    private void updateRenderAbleBlockEntitiesInject(CallbackInfo ci) {
+        ArrayUtils.forEach(this.allRenderableBlockEntities, BlockEntity::onTick);
+    }
     public Array<BlockEntity> allRenderableBlockEntities = new Array<>();
 
     @Override

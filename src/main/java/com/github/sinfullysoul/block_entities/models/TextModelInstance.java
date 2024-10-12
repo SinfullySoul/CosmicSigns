@@ -46,6 +46,7 @@ public class TextModelInstance {
         this.fontSize = fontSize;
         CHAR_UV_X = 16f / CosmicReachFont.FONT.getRegion().getRegionWidth(); //TODO CHANGE THIS
         CHAR_UV_Y = 16f / CosmicReachFont.FONT.getRegion().getRegionHeight() ;
+        updateLight();
     }
     public void update() {
         this.modelMat.idt();
@@ -62,12 +63,7 @@ public class TextModelInstance {
             return;
         }
 
-        Entity.setLightingColor(zone,position,Sky.currentSky.currentAmbientColor,tintColor,tmpBlockPos1,tmpBlockPos2); //TODO doesnt quite work with colors should also find out how to remove this from render
-        if (this.glowing) {
-            this.tintColor.set(this.textColor);
-        } else {
-            this.tintColor.mul(textColor);
-        }
+
         this.shader.bind(worldCamera);
         this.shader.bindOptionalTexture("texDiffuse", this.texture, 0);
         this.shader.bindOptionalUniform4f("tintColor", this.tintColor.mul(1.0f));
@@ -201,5 +197,14 @@ public class TextModelInstance {
 
 
         return pos + advance * 2.0f;
+    }
+
+    public void updateLight() { //maybe 5% improvment with around 100 signs by doing this on update insteadc of render not very noticeable
+        Entity.setLightingColor(zone,position,Sky.currentSky.currentAmbientColor,tintColor,tmpBlockPos1,tmpBlockPos2); //TODO doesnt quite work with colors should also find out how to remove this from render
+        if (this.glowing) {
+            this.tintColor.set(this.textColor);
+        } else {
+            this.tintColor.mul(textColor);
+        }
     }
 }

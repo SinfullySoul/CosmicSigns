@@ -42,6 +42,10 @@ public class SignBlockEntity extends BlockEntity implements IRenderable {
             return new SignBlockEntity(zone, x, y, z);
         });
     }
+    public void onTick() { //used to update the text tint so its not glowing todo find a better way to do this
+        super.onTick();
+        textModel.updateLight();
+    }
 
     @Override
     public void onInteract(Player player, Zone zone) {
