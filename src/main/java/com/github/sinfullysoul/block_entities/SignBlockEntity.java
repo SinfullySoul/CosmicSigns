@@ -176,7 +176,6 @@ private void buildMesh() {
             stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(newString.charAt(x)).xadvance;
             float MAX_TEXT_LENGTH = 11f;
             if (stringPixelLength / (22F -this.textSize) > MAX_TEXT_LENGTH) {
-                Constants.LOGGER.info("String {} , pixelLength {}, Out {}",newString, stringPixelLength, x);
                 return x; //return the index of the character that exceeds the font max length
             }
         }
