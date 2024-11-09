@@ -3,7 +3,6 @@ package com.github.sinfullysoul.screens;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -14,41 +13,38 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.github.puzzle.game.ui.font.CosmicReachFont;
-import com.github.puzzle.game.ui.screens.BasePuzzleScreen;
-import com.github.sinfullysoul.Constants;
-import com.github.sinfullysoul.block_entities.SignBlockEntity;
-import finalforeach.cosmicreach.Threads;
-import finalforeach.cosmicreach.blockentities.BlockEntity;
-import finalforeach.cosmicreach.entities.player.Player;
-import finalforeach.cosmicreach.items.containers.SlotContainer;
+import com.github.sinfullysoul.blockentities.SignBlockEntity;
+import com.github.sinfullysoul.network.packets.SignsEntityPacket;
+import finalforeach.cosmicreach.items.screens.BaseItemScreen;
+import finalforeach.cosmicreach.networking.client.ClientNetworkManager;
 import finalforeach.cosmicreach.ui.UI;
 import finalforeach.cosmicreach.ui.widgets.ItemSlotWidget;
-import finalforeach.cosmicreach.world.Zone;
 
-import static com.github.sinfullysoul.CosmicSigns.setDisableKeyboardInput;
+import static com.github.sinfullysoul.ClientInitializer.setDisableKeyboardInput;
 
-public class SignScreen extends BasePuzzleScreen {
+public class SignScreen extends BaseItemScreen {
 
     static TextField.TextFieldStyle style;
     static Label.LabelStyle styleTextSize;
     static final String baseText = "line ";
     static Drawable buttonRight;
     static Drawable buttonLeft;
+
     public SignBlockEntity entity;
     private String[] texts;
 
-    public SignScreen(){
-
-    }
-
     public SignScreen(SignBlockEntity entity) {
-        Threads.runOnMainThread(() -> {
-            if(style.background == null) {
-                style.background = new NinePatchDrawable(UI.containerBackground9Patch);
-                buttonRight = new NinePatchDrawable(UI.containerBackground9Patch);
-                buttonLeft = new NinePatchDrawable(UI.containerBackground9Patch);
-            }
-        });
+        super(null);
+        if(style == null) {
+            style = new TextField.TextFieldStyle();
+            style.font = CosmicReachFont.createCosmicReachFont();
+            style.fontColor = Color.WHITE;
+            style.font.getData().capHeight = -12f;
+            style.background = new NinePatchDrawable(UI.containerBackground9Patch);
+            styleTextSize = new Label.LabelStyle(CosmicReachFont.createCosmicReachFont(), Color.WHITE);
+            buttonRight = new NinePatchDrawable(UI.containerBackground9Patch);
+            buttonLeft = new NinePatchDrawable(UI.containerBackground9Patch);
+        }
 
         this.entity = entity;
         this.texts = this.entity.getText();
@@ -71,11 +67,9 @@ public class SignScreen extends BasePuzzleScreen {
                     int addedLength = this.entity.isTextMaxSize(line1.getText());
                     if( addedLength > 0 ) {
                         line1.setText(this.texts[0]); //set to the last working string
-
                     }
                 }
-
-                this.texts[0] = line1.getText();
+                entity.setTextToLine(0, line1.getText());
             }
 
             return false;
@@ -93,7 +87,7 @@ public class SignScreen extends BasePuzzleScreen {
                         line2.setText(this.texts[1]);
                     }
                 }
-                this.texts[1] = line2.getText();
+                entity.setTextToLine(1, line2.getText());
             }
 
             return false;
@@ -111,18 +105,18 @@ public class SignScreen extends BasePuzzleScreen {
                         line3.setText(this.texts[2]);
                     }
                 }
-                this.texts[2] = line3.getText();
+                entity.setTextToLine(2, line3.getText());
             }
 
             return false;
         });
 
-        Label fontSizeLabel = new Label("" + this.entity.textSize, styleTextSize);
+        Label fontSizeLabel = new Label("" + this.entity.getFontSize(), styleTextSize);
         fontSizeLabel.setAlignment(Align.center);
         fontSizeLabel.addAction(new Action() {
             @Override
             public boolean act(float v) {
-                fontSizeLabel.setText(""+(int)entity.textSize);
+                fontSizeLabel.setText(""+(int)entity.getFontSize());
                 return false;
             }
         });
@@ -131,8 +125,8 @@ public class SignScreen extends BasePuzzleScreen {
             final SignBlockEntity entity = SignScreen.this.entity;
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(entity.textSize > 7) {
-                    entity.textSize -= 1;
+                if(entity.getFontSize() > 7) {
+                    entity.setFontSize(entity.getFontSize() - 1);
                     entity.runTexture = true;
                 }
             }
@@ -142,8 +136,8 @@ public class SignScreen extends BasePuzzleScreen {
             final SignBlockEntity entity = SignScreen.this.entity;
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if(entity.textSize < 15) {
-                    entity.textSize += 1;
+                if(entity.getFontSize() < 15) {
+                    entity.setFontSize(entity.getFontSize() + 1);
                     entity.runTexture = true;
                 }
             }
@@ -186,7 +180,7 @@ public class SignScreen extends BasePuzzleScreen {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     super.clicked(event, x, y);
-                    entity.fontcolor.set(color);
+                    entity.setTextColor(color.cpy());
                     entity.runTexture = true;
                 }
             });
@@ -199,26 +193,15 @@ public class SignScreen extends BasePuzzleScreen {
 
     @Override
     public void onRemove() {
-        super.onRemove();
         this.entity.runTexture = true;
         setDisableKeyboardInput(false);
+        if(ClientNetworkManager.isConnected()) ClientNetworkManager.sendAsClient(new SignsEntityPacket(this.entity));
+        super.onRemove();
     }
 
     @Override
-    public void OnOpen(Player player, Zone zone, BlockEntity blockEntity) {
-        SignScreen screen = new SignScreen((SignBlockEntity) blockEntity);
-        UI.addOpenBaseItemScreen(new SlotContainer(0), screen);
+    public void onShow() {
         setDisableKeyboardInput(true);
-    }
-
-    static {
-        Threads.runOnMainThread(() -> {
-            style = new TextField.TextFieldStyle();
-            style.font = CosmicReachFont.createCosmicReachFont();
-            style.fontColor = Color.WHITE;
-            style.font.getData().capHeight = -12f;
-            BitmapFont fontsize = CosmicReachFont.createCosmicReachFont();
-            styleTextSize = new Label.LabelStyle(fontsize, Color.WHITE);
-        });
+        super.onShow();
     }
 }

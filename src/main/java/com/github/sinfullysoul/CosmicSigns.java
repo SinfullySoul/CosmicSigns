@@ -1,37 +1,33 @@
 package com.github.sinfullysoul;
 
-import com.github.puzzle.core.PuzzleRegistries;
+import com.github.puzzle.core.loader.launch.Piece;
+import com.github.puzzle.core.loader.meta.EnvType;
+import com.github.puzzle.core.loader.provider.mod.entrypoint.impls.ModInitializer;
+import com.github.puzzle.game.PuzzleRegistries;
 import com.github.puzzle.game.block.DataModBlock;
 import com.github.puzzle.game.events.OnRegisterBlockEvent;
-import com.github.puzzle.game.ui.screens.BasePuzzleScreen;
-import com.github.puzzle.loader.entrypoint.interfaces.ModInitializer;
-import com.github.sinfullysoul.block_entities.SignBlockEntity;
-import com.github.sinfullysoul.screens.SignScreen;
+import com.github.puzzle.game.ui.screens.handlers.GenericServerScreenHandler;
+import com.github.sinfullysoul.blockentities.ServerSignBlockEntity;
+import com.github.sinfullysoul.network.packets.SignsEntityPacket;
+import finalforeach.cosmicreach.networking.GamePacket;
 import finalforeach.cosmicreach.util.Identifier;
-import org.greenrobot.eventbus.Subscribe;
+import meteordevelopment.orbit.EventHandler;
 
 public class CosmicSigns implements ModInitializer {
 
-    private static Boolean disablekeyboard = false;
-
     @Override
     public void onInit() {
-        PuzzleRegistries.EVENT_BUS.register(this);
+        PuzzleRegistries.EVENT_BUS.subscribe(this);
+        GamePacket.registerPacket(SignsEntityPacket.class);
 
-        SignBlockEntity.register();
-        BasePuzzleScreen.registerScreen(SignBlockEntity.id, new SignScreen());
+        if(Piece.getSide() == EnvType.SERVER) {
+            ServerSignBlockEntity.register();
+            GenericServerScreenHandler.register(ServerSignBlockEntity.id);
+        }
     }
 
-    @Subscribe
+    @EventHandler
     public void onEvent(OnRegisterBlockEvent event) {
         event.registerBlock(() -> new DataModBlock(Identifier.of(Constants.MOD_ID, "sign.json")));
-    }
-
-    public static void setDisableKeyboardInput(boolean state){
-        disablekeyboard = state;
-    }
-
-    public static boolean getDisableKeyboardInput() {
-        return disablekeyboard;
     }
 }
