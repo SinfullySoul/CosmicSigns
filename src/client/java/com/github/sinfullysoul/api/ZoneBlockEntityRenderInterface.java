@@ -1,4 +1,4 @@
-package com.github.sinfullysoul.block_entities;
+package com.github.sinfullysoul.api;
 
 import com.badlogic.gdx.utils.Array;
 import finalforeach.cosmicreach.blockentities.BlockEntity;

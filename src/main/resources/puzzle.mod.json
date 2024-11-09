@@ -1,4 +1,5 @@
 {
+  "formatVersion": 1,
   "id": "${mod_id}",
   "version": "${mod_version}",
   "name": "${mod_name}",
@@ -10,16 +11,26 @@
     "icon": "cosmic-signs:icons/icon.png"
   },
   "entrypoints": {
+    "client_init": [
+      "com.github.sinfullysoul.ClientInitializer"
+    ],
     "init": [
       "com.github.sinfullysoul.CosmicSigns"
     ]
   },
   "mixins": [
-    "cosmic-signs.mixins.json"
+    {
+      "config": "cosmic-signs.client.mixins.json",
+      "environment": "client"
+    },
+    {
+      "config": "cosmic-signs.server.mixins.json",
+      "environment": "server"
+    }
   ],
-  "dependencies": {
-    "cosmic-reach": ">=0.3.1",
-    "puzzle-loader": ">=1.5.9"
+  "depends": {
+    "cosmic-reach": ">=0.3.6",
+    "puzzle-loader": ">=2.1.3"
   },
   "accessManipulator": "cosmic-signs.manipulator"
 }
