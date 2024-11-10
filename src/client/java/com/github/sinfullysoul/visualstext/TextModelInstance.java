@@ -140,7 +140,6 @@ public class TextModelInstance {
         //ySpacing is used so smaller fonts arent bunched up on the sign and have more spacing between lines
         if(centered) {
             this.yStart = yStart+  ( texts.length / ( 2f) - (1f ) + (ySpacing - 1f));
-            Constants.LOGGER.info("YSTART {}: YSPACING {}", this.yStart, ySpacing);
         }
         for (int l = 0; l<texts.length; l++) {
             if(isCentered) {

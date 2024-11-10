@@ -156,9 +156,11 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
         int stringPixelLength = 0;
         for(int x = 0; x < newString.length(); x++) {
             stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(newString.charAt(x)).xadvance;
-            float MAX_TEXT_LENGTH = 11f;
-            if (stringPixelLength / (22F -this.textModel.getFontSize()) > MAX_TEXT_LENGTH) {
-                return x; //return the index of the character that exceeds the font max length
+            float MAX_TEXT_LENGTH = 1229f; //TODO make this json customizable / based on model size? for now i just trail n error it
+            if (stringPixelLength * this.textModel.getFontSize() > MAX_TEXT_LENGTH) {
+               //using Constants.LOGGER.info("String {} , pixelLength {}, Out {}",newString, stringPixelLength, x);
+                return x; //return the index of the character that exceeds the font max length so pasting will be clipped
+
             }
         }
         return -1; //return -1 if it doesnt exceed the limit
