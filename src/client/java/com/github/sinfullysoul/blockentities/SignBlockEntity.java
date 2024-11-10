@@ -118,7 +118,6 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
 
         this.textModel.setRotationY(rotation);
         this.textModel.update();
-        //in textModel smaller numbers result in bigger fonts so im inverting them
         this.textModel.buildTextMesh(this.texts, 0f,0f,0.075f, true);
     }
 
@@ -159,7 +158,6 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
             stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(newString.charAt(x)).xadvance;
             float MAX_TEXT_LENGTH = 11f;
             if (stringPixelLength / (22F -this.textModel.getFontSize()) > MAX_TEXT_LENGTH) {
-                Constants.LOGGER.info("String {} , pixelLength {}, Out {}",newString, stringPixelLength, x);
                 return x; //return the index of the character that exceeds the font max length
             }
         }
