@@ -17,7 +17,7 @@ void main()
 
     vec4 newColor;
     int isglowing = funcMask & 0x01;
-    int hasboarder = funcMask & 0x02;
+    int hasborder = funcMask & 0x02;
 
     vec2 texOffset = vec2(0.6 / texWidth, 0.6 / texHeight);
     vec4 left = texture2D(texDiffuse, v_texCoord0 - vec2(texOffset.x, 0.0));
@@ -25,7 +25,7 @@ void main()
     vec4 up = texture2D(texDiffuse, v_texCoord0 + vec2(0.0, texOffset.y));
     vec4 down = texture2D(texDiffuse, v_texCoord0 - vec2(0.0, texOffset.y));
 
-    if (hasboarder == 2 && texColor.a > 0.0 && (left.a == 0.0 || right.a == 0.0 || up.a == 0.0 || down.a == 0.0)) newColor = outlineColor;
+    if (hasborder == 2 && texColor.a > 0.0 && (left.a == 0.0 || right.a == 0.0 || up.a == 0.0 || down.a == 0.0)) newColor = outlineColor;
     else newColor = color;
     if(isglowing != 1) newColor = newColor * ambientColor;
 
