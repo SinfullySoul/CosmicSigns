@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.ShortArray;
 import com.github.puzzle.game.ui.font.CosmicReachFont;
+import com.github.sinfullysoul.Constants;
 import finalforeach.cosmicreach.world.Sky;
 import finalforeach.cosmicreach.world.Zone;
 
@@ -115,7 +116,7 @@ public class TextModelInstance {
         if (mesh!= null) {
             mesh.dispose();
         }
-        float invertedTextSize = this.getFontSize() / 102;
+        float invertedTextSize = this.getFontSize() / 102f;
         this.isCentered = centered;
         this.xStart = xStart;
         this.yStart = yStart;
@@ -134,26 +135,24 @@ public class TextModelInstance {
         FloatArray verts = new FloatArray( length * 4 * 5); //character length * vertexes * vertex attributes
         ShortArray indicies = new ShortArray(length * 6);
         charCounter = 0;
-        float ySpacing = Math.max(invertedTextSize / 9f, 1.0f); //TODO dont make this hardcoded
+       // float ySpacing = Math.max((float)(22 - fontSize) / 7f , 1.0f); //TODO dont make this hardcoded
+        float ySpacing = Math.max(15f/(float)Math.pow(fontSize,1.5)+0.7428f ,1.0f); //this is specific to the current sign font range of 7-15
+        //ySpacing is used so smaller fonts arent bunched up on the sign and have more spacing between lines
         if(centered) {
-            this.yStart =  yStart + (ySpacing * texts.length / (invertedTextSize * 2f) - (1f / invertedTextSize) );
+            this.yStart = yStart+  ( texts.length / ( 2f) - (1f ) + (ySpacing - 1f));
+            Constants.LOGGER.info("YSTART {}: YSPACING {}", this.yStart, ySpacing);
         }
         for (int l = 0; l<texts.length; l++) {
             if(isCentered) {
                 int stringPixelLength =0;
-
                 for(int x = 0; x < texts[l].length(); x++) {
-
-                    stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(texts[l].charAt(x)).xadvance;
-
+                    stringPixelLength += CosmicReachFont.FONT.getData().getGlyph(texts[l].charAt(x)).xadvance; //this is in pixels each char is
                 }
-                this.xStart = -xStart -  (stringPixelLength / 16f) / (2f *  invertedTextSize) - 0.5f / invertedTextSize ; // subtract one half font size character to center on block center
-
+                this.xStart = -(stringPixelLength / 16f) / (2f ) - 0.5f  ; // subtract one half font size character to center on block center
             }
             float charPos = 0;
             for(int i = 0; i < texts[l].length(); i++ ) {
                 charPos =  addCharacterQuad(verts, indicies, texts[l].charAt(i),charPos, (float)l * ySpacing, invertedTextSize);
-
             }
         }
         mesh = new Mesh(false, verts.size, indicies.size,
@@ -171,8 +170,8 @@ public class TextModelInstance {
         BitmapFont.Glyph glyph = CosmicReachFont.FONT.getData().getGlyph(c);
         float advance = glyph.xadvance / 2.0f;
 
-        float x = invertedTextSize * xStart + (pos + advance) / 16f;//divide by the char size  pos is in
-        float y = (invertedTextSize) * yStart - line ; //TODO add line offset
+        float x =  xStart + (pos + advance) / 16f ;//divide by the char size  pos is in
+        float y =  yStart - line  ;
         float z = zStart;
 
         verts.add( x); // x1
