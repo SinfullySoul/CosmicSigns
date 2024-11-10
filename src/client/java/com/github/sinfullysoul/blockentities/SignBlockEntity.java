@@ -136,12 +136,11 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
 
     @Override
     public void onRender(Camera camera) {
-        if(camera == null) return;
         if (runTexture) {
             runTexture = false;
             buildMesh();
         }
-        if(this.textModel != null) textModel.render(camera);
+        textModel.render(camera);
     }
 
     @Override

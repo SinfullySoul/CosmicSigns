@@ -16,7 +16,7 @@ public class TextModelInstance {
     private Texture texture;
 
     public Zone zone;
-    public Vector3 position;
+    public  Vector3 position = new Vector3();
     public float rotationY = 0f;
     public boolean isCentered = true;
 
@@ -41,7 +41,7 @@ public class TextModelInstance {
 
     public TextModelInstance(Zone zone, Vector3 position) {
         this.zone = zone;
-        this.position = position;
+        this.position.set(position);
         if(this.texture == null) { // set the default font to CR font
             this.texture = CosmicReachFont.FONT.getRegion().getTexture();
             this.CHAR_UV_X = 16f / CosmicReachFont.FONT.getRegion().getRegionWidth();
@@ -74,7 +74,7 @@ public class TextModelInstance {
 
     public void update() {
         this.modelMat.idt();
-        modelMat.rotate(new Vector3(0,1,0), this.rotationY);
+        modelMat.rotate(Vector3.Y, this.rotationY);
         modelMat.scale(this.fontSize / 102f, this.fontSize / 102f,1.0f);
         modelMat.trn(position.x,position.y,position.z);
     }

@@ -22,7 +22,7 @@ public abstract class PlayerEntityMixin extends Entity {
     }
 
     private void spawnNameTag() {
-        nameTag = new TextModelInstance(this.player.getZone(), this.getPosition().cpy());
+        nameTag = new TextModelInstance(this.player.getZone(), this.getPosition());
         nameTag.setFontSize(24f);
         nameTag.setColor(Color.WHITE);
         nameTag.isGlowing(true);
