@@ -62,7 +62,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
             this.textModel = new TextModelInstance(((BlockEntityInterface)this).getZone(),
                     new Vector3(this.getGlobalX(), this.getGlobalY(), this.getGlobalZ()).add(0.5f, 0.6f, 0.5f));
             this.textModel.isGlowing(false);
-            this.textModel.hasBoarder(true);
+            this.textModel.hasBorder(true);
         } else {
             this.runTexture = true;
         }

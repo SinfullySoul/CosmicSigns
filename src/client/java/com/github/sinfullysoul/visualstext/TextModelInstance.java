@@ -21,7 +21,7 @@ public class TextModelInstance {
     public boolean isCentered = true;
 
     private Color textColor = Color.BLACK.cpy();
-    private Color boarderColor = Color.GOLD.cpy();
+    private Color borderColor = Color.GOLD.cpy();
     private int funcMask = 0;
     private float fontSize = 8f;
     private Matrix4 modelMat = new Matrix4();
@@ -57,7 +57,7 @@ public class TextModelInstance {
         this.shader.bindOptionalTexture("texDiffuse", this.texture, 0);
         this.shader.bindOptionalUniform4f("color", this.textColor);
         this.shader.bindOptionalUniform4f("ambientColor", Sky.currentSky.currentAmbientColor);
-        this.shader.bindOptionalUniform4f("outlineColor", boarderColor);
+        this.shader.bindOptionalUniform4f("outlineColor", borderColor);
         this.shader.bindOptionalMatrix4("u_modelMat", modelMat);
         this.shader.bindOptionalFloat("texWidth", (float) this.texture.getWidth());
         this.shader.bindOptionalFloat("texHeight", (float) this.texture.getHeight());
@@ -84,7 +84,7 @@ public class TextModelInstance {
         else this.funcMask &= ~1;
     }
 
-    public void hasBoarder(boolean is){
+    public void hasBorder(boolean is){
         if(is) this.funcMask |= 2;
         else this.funcMask &= ~2;
     }
