@@ -22,7 +22,7 @@ public abstract class PlayerEntityMixin extends Entity {
     }
 
     private void spawnNameTag() {
-        nameTag = new TextModelInstance(this.player.getZone(), this.getPosition().cpy());
+        nameTag = new TextModelInstance(this.player.getZone(), this.getPosition());
         nameTag.setFontSize(24f);
         nameTag.setColor(Color.WHITE);
         nameTag.isGlowing(true);
@@ -34,9 +34,9 @@ public abstract class PlayerEntityMixin extends Entity {
         if (!GameSingletons.isClient || GameSingletons.client().getLocalPlayer() != this.player) {
             super.render(worldCamera);
             if (this.nameTag != null) {
-                Vector3 pos = this.getPosition().cpy().add(0f, 1.2f, 0f);
+                Vector3 pos = this.getPosition();
                 this.nameTag.rotationY = (float) Math.toDegrees(Math.atan2(worldCamera.position.x - pos.x, worldCamera.position.z - pos.z));
-                this.nameTag.position.set(pos);
+                this.nameTag.position.set(pos.x,pos.y + 1.2f, pos.z);
                 this.nameTag.update();
                 this.nameTag.render(worldCamera);
             } else {

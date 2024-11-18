@@ -62,7 +62,7 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
             this.textModel = new TextModelInstance(((BlockEntityInterface)this).getZone(),
                     new Vector3(this.getGlobalX(), this.getGlobalY(), this.getGlobalZ()).add(0.5f, 0.6f, 0.5f));
             this.textModel.isGlowing(false);
-            this.textModel.hasBoarder(true);
+            this.textModel.hasBorder(true);
         } else {
             this.runTexture = true;
         }
@@ -94,9 +94,13 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
         dir = blockState.rotXZ;
         dir -= 90;
         ((ZoneBlockEntityRenderInterface) ((BlockEntityInterface)this).getZone()).addRenderableBlockEntity(this);
-        if(this.textModel == null) this.textModel =
-                new TextModelInstance(((BlockEntityInterface)this).getZone(),
-                        new Vector3(this.getGlobalX(), this.getGlobalY(), this.getGlobalZ()).add(0.5f, 0.6f, 0.5f));
+        if(this.textModel == null) {
+            this.textModel =
+                    new TextModelInstance(((BlockEntityInterface)this).getZone(),
+                            new Vector3(this.getGlobalX(), this.getGlobalY(), this.getGlobalZ()).add(0.5f, 0.6f, 0.5f));
+            this.textModel.isGlowing(false);
+            this.textModel.hasBorder(true);
+        }
     }
 
     @Override
@@ -118,7 +122,6 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
 
         this.textModel.setRotationY(rotation);
         this.textModel.update();
-        //in textModel smaller numbers result in bigger fonts so im inverting them
         this.textModel.buildTextMesh(this.texts, 0f,0f,0.075f, true);
     }
 
@@ -136,12 +139,11 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
 
     @Override
     public void onRender(Camera camera) {
-        if(camera == null) return;
         if (runTexture) {
             runTexture = false;
             buildMesh();
         }
-        if(this.textModel != null) textModel.render(camera);
+        textModel.render(camera);
     }
 
     @Override
@@ -158,10 +160,11 @@ public class SignBlockEntity extends BlockEntity implements IRenderable, ISignBl
         int stringPixelLength = 0;
         for(int x = 0; x < newString.length(); x++) {
             stringPixelLength+= CosmicReachFont.FONT.getData().getGlyph(newString.charAt(x)).xadvance;
-            float MAX_TEXT_LENGTH = 11f;
-            if (stringPixelLength / (22F -this.textModel.getFontSize()) > MAX_TEXT_LENGTH) {
-                Constants.LOGGER.info("String {} , pixelLength {}, Out {}",newString, stringPixelLength, x);
-                return x; //return the index of the character that exceeds the font max length
+            float MAX_TEXT_LENGTH = 1229f; //TODO make this json customizable / based on model size? for now i just trail n error it
+            if (stringPixelLength * this.textModel.getFontSize() > MAX_TEXT_LENGTH) {
+               //using Constants.LOGGER.info("String {} , pixelLength {}, Out {}",newString, stringPixelLength, x);
+                return x; //return the index of the character that exceeds the font max length so pasting will be clipped
+
             }
         }
         return -1; //return -1 if it doesnt exceed the limit

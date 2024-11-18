@@ -15,19 +15,14 @@ public class VisualTextShader extends GameShader {
     public static VisualTextShader TEXT_SHADER;
     private static VertexAttribute posAttrib = VertexAttribute.Position();
     private static VertexAttribute texCoordsAttrib = VertexAttribute.TexCoords(0);
-    private static VertexAttribute color = new VertexAttribute(2, 4, 5126, false, "color");
-    private static VertexAttribute ambientColor = new VertexAttribute(3, 4, 5126, false, "ambientColor");
-    private static VertexAttribute outlineColor = new VertexAttribute(4, 4, 5126, false, "outlineColor");
-    private static VertexAttribute texWidth = new VertexAttribute(5, 1, 5126, false, "texWidth");
-    private static VertexAttribute texHeight = new VertexAttribute(6, 1, 5126, false, "texHeight");
-    private static VertexAttribute funcMask = new VertexAttribute(7, 1, 5125, false, "funcMask");
+
 
     public VisualTextShader(Identifier vertexShader, Identifier fragmentShader) {
         super();
         FileHandle textVert = PuzzleGameAssetLoader.locateAsset(vertexShader);
         FileHandle textFrag = PuzzleGameAssetLoader.locateAsset(fragmentShader);
         this.shader = new ShaderProgram(textVert, textFrag);
-        this.allVertexAttributesObj = new VertexAttributes(new VertexAttribute[]{posAttrib, texCoordsAttrib, color, ambientColor, outlineColor, texWidth, texWidth, texHeight, funcMask});
+        this.allVertexAttributesObj = new VertexAttributes(new VertexAttribute[]{posAttrib, texCoordsAttrib});
     }
 
     public static void initTextShader() {
